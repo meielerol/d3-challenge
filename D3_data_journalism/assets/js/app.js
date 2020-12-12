@@ -1,5 +1,36 @@
+// set the data set constant reference
 const dataUrl = "./assets/data/data.csv";
 
+// set the svg up
+let svgWidth = 690;
+let svgHeight = 500;
+let margin = {
+    top: 20,
+    bottom: 20,
+    left: 40,
+    right: 40
+};
+let width = svgWidth - margin.left - margin.right;
+let height = svgHeight - margin.top - margin.bottom;
+
+// svg wrapper
+let svg = d3.select("#scatter")
+    .append("svg")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight);
+
+// append svg group
+let chartGroup = svg.append("g")
+    // .attr("transform",`translate(${margin.left},${margin.top})`);
+
+// changeable axis
+
+
+// ADD FUNCTION FOR UDATING SCALES
+
+
+
+// select the data for the charts from the csv
 d3.csv(dataUrl).then(data => {
     console.log(data);
 
