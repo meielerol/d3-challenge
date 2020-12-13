@@ -7,7 +7,7 @@ let svgHeight = 500;
 let margin = {
     top: 20,
     bottom: 100,
-    left: 100,
+    left: 120,
     right: 40
 };
 let width = svgWidth - margin.left - margin.right;
@@ -27,28 +27,64 @@ let chartGroup = svg.append("g")
 let chosenXaxis = "obesity";
 let chosenYaxis = "age";
 
-// render the scales with 20% buffers
+// create the axes scale ranges with 20% buffers
 function renderXScale(healthdata, chosenXaxis) {
-    let xLinearScale = d3.scaleLinear()
+    let updateXLinearScale = d3.scaleLinear()
         .domain([
             d3.min(healthdata, data => data[chosenXaxis]) * 0.8,
             d3.max(healthdata, data => data[chosenXaxis]) * 1.2
         ])
         .range([0,width]);
-    return xLinearScale;
+    return updateXLinearScale;
 };
 function renderYScale(healthdata, chosenYaxis) {
-    let yLinearScale = d3.scaleLinear()
+    let updateYLinearScale = d3.scaleLinear()
         .domain([
             d3.min(healthdata, data => data[chosenYaxis]) * 0.8,
             d3.max(healthdata, data => data[chosenYaxis]) * 1.2
         ])
         .range([height,0]);
 
-    return yLinearScale;
+    return updateYLinearScale;
 };
 
-//
+// render axes with updated scaled ranges
+function renderXAxes(updateXScale, updateXAxis) {
+    let bottomAxis = d3.axisBottom(updateXScale);
+
+    updateXAxis.transition()
+        .duration(1000)
+        .call(bottomAxis);
+    
+    return updateXAxis;
+};
+function renderYAxes(updateYScale, updateYAxis) {
+    let leftAxis = d3.axisLeft(updateYScale);
+
+    updateYAxis.transition()
+        .duration(1000)
+        .call(leftAxis);
+    
+    return updateYAxis;
+};
+
+// render updated circlesGroup
+function renderCircling(updateCircling, updateXLinearScale, updateYLinearScale, chosenXaxis, chosenYaxis) {
+    updateCircling.transition()
+        .duration(1000)
+        .attr("cx", data => updateXLinearScale(data[chosenXaxis]))
+        .attr("cy", data => updateYLinearScale(data[chosenYaxis]));
+    
+    return updateCircling;
+};
+function renderTexting(updateTexting, updateXLinearScale, updateYLinearScale, chosenXaxis, chosenYaxis) {
+    updateTexting.transition()
+        .duration(1000)
+        .attr("x", data => updateXLinearScale(data[chosenXaxis]))
+        .attr("y", data => updateYLinearScale(data[chosenYaxis])+4);
+
+    return updateTexting;
+};
 
 // select the data for the charts from the csv
 d3.csv(dataUrl).then(healthdata => {
@@ -151,7 +187,7 @@ d3.csv(dataUrl).then(healthdata => {
         .attr("y",0-20)
         .attr("transform","rotate(-90)")
         .attr("dy","1em")
-        .attr("value","age")
+        .attr("value","income")
         .classed("inactive",true) //from d3Style.css
         .classed("aText",true) //from d3Style.css
         .text("Income")
@@ -160,8 +196,142 @@ d3.csv(dataUrl).then(healthdata => {
         .attr("y",0-40)
         .attr("transform","rotate(-90)")
         .attr("dy","1em")
-        .attr("value","age")
+        .attr("value","poverty")
         .classed("inactive",true) //from d3Style.css
         .classed("aText",true) //from d3Style.css
         .text("Poverty")
+
+    // switch between axes labels
+    xLabelsGroup.selectAll("text")
+        .on("click", function(){
+            // get value of the selection
+            let xAxisSelect = d3.select(this).attr("value");
+            // console.log("xaxis selected:",xAxisSelect);
+
+            // reassign xaxis if necessary
+            if (xAxisSelect !== chosenXaxis) {
+                // reassign chosenXaxis
+                chosenXaxis = xAxisSelect;
+                // console.log("new xaxis:",chosenXaxis);
+
+                // update the scales and axis with new xaxis info
+                xLinearScale = renderXScale(healthdata,chosenXaxis);
+                xAxis = renderXAxes(xLinearScale, xAxis);
+
+                // update the circles with new xaxis info
+                circling = renderCircling(circling, xLinearScale, yLinearScale, chosenXaxis, chosenYaxis);
+                texting = renderTexting(texting, xLinearScale, yLinearScale, chosenXaxis, chosenYaxis);
+
+                // update xaxis title to active selection
+                if (chosenXaxis === "obesity") {
+                    obesityLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    healthcareLabel
+                        .classed("active", false)
+                        .classed("inactive",true);
+                    smokesLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                } else if (chosenXaxis === "healthcare") {
+                    obesityLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    healthcareLabel
+                        .classed("active", true)
+                        .classed("inactive",false);
+                    smokesLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                } else if (chosenXaxis === "smokes") {
+                    obesityLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    healthcareLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    smokesLabel
+                        .classed("active",true)
+                        .classed("inactive",false);
+                } else {
+                    console.log("Something went wrong swithcing xaxis labels");
+                    obesityLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    healthcareLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    smokesLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                };//end updating xaxis titles to active selection
+            };//end xAxisSelect main IF
+        });//end xLabelsGroup.on("click",function(){})
+    // end xLabelsGroup update
+    yLabelsGroup.selectAll("text")
+        .on("click", function(){
+            // get value of the selection
+            let yAxisSelect = d3.select(this).attr("value");
+            // console.log("yaxis selected:",yAxisSelect);
+
+            // reassign yaxis if necessary
+            if (yAxisSelect !== chosenYaxis) {
+                // reassign chosenYaxis
+                chosenYaxis = yAxisSelect;
+                // console.log("new yaxis:",chosenYaxis);
+
+                // update the scales and axis with new yaxis info
+                yLinearScale = renderYScale(healthdata,chosenYaxis);
+                yAxis = renderYAxes(yLinearScale, yAxis);
+
+                // update the circles with new yaxis info
+                circling = renderCircling(circling, xLinearScale, yLinearScale, chosenXaxis, chosenYaxis);
+                texting = renderTexting(texting, xLinearScale, yLinearScale, chosenXaxis, chosenYaxis);
+
+                // update yaxis title to active selection
+                if (chosenYaxis === "age") {
+                    ageLabel
+                        .classed("active", true)
+                        .classed("inactive", false);
+                    incomeLabel
+                        .classed("active", false)
+                        .classed("inactive",true);
+                    povertyLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                } else if (chosenYaxis === "income") {
+                    ageLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    incomeLabel
+                        .classed("active", true)
+                        .classed("inactive",false);
+                    povertyLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                } else if (chosenYaxis === "poverty") {
+                    ageLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    incomeLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    povertyLabel
+                        .classed("active",true)
+                        .classed("inactive",false);
+                } else {
+                    console.log("Something went wrong swithcing yaxis labels");
+                    ageLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                        incomeLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                        povertyLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                };//end updating yaxis titles to active selection
+            };//end yAxisSelect main IF
+        });//end yLabelsGroup.on("click",function(){})
+    // end yLabelsGroup update
 });
