@@ -27,24 +27,24 @@ let chartGroup = svg.append("g")
 d3.csv(dataUrl).then(healthdata => {
     // parse data and make them integers
     healthdata.forEach(data => {
-        healthdata.id = +healthdata.id;
-        healthdata.age = +healthdata.age;
-        healthdata.ageMoe = +healthdata.ageMoe;
-        healthdata.healthcare = +healthdata.healthcare;
-        healthdata.healthcareHigh = +healthdata.healthcareHigh;
-        healthdata.healthcareLow = +healthdata.healthcareLow;
-        healthdata.income = +healthdata.income;
-        healthdata.incomeMoe = +healthdata.incomeMoe;
-        healthdata.obesity = +healthdata.obesity;
-        healthdata.obesityHigh = +healthdata.obesityHigh;
-        healthdata.obesityLow = +healthdata.obesityLow;
-        healthdata.poverty = +healthdata.poverty;
-        healthdata.povertyMoe = +healthdata.povertyMoe;
-        healthdata.smokes = +healthdata.smokes;
-        healthdata.smokesHigh = +healthdata.smokesHigh;
-        healthdata.smokesLow = +healthdata.smokesLow;
+        data.id = +data.id;
+        data.age = +data.age;
+        data.ageMoe = +data.ageMoe;
+        data.healthcare = +data.healthcare;
+        data.healthcareHigh = +data.healthcareHigh;
+        data.healthcareLow = +data.healthcareLow;
+        data.income = +data.income;
+        data.incomeMoe = +data.incomeMoe;
+        data.obesity = +data.obesity;
+        data.obesityHigh = +data.obesityHigh;
+        data.obesityLow = +data.obesityLow;
+        data.poverty = +data.poverty;
+        data.povertyMoe = +data.povertyMoe;
+        data.smokes = +data.smokes;
+        data.smokesHigh = +data.smokesHigh;
+        data.smokesLow = +data.smokesLow;
     });
-    console.log("data",healthdata);
+    console.log("healthdata",healthdata);
 
     // scale the function
     let xLinearScale = d3.scaleLinear()
@@ -91,6 +91,21 @@ d3.csv(dataUrl).then(healthdata => {
         .attr("fill","white")
         .attr("font-size", "11px")
         .attr("text-anchor", "middle")
+
+    // create tool tips for circles
+    let toolTip = d3.tip()
+        .attr("class","d3-tip") //from d3Style.css
+        .offset([80,-50])
+        .html(data => `${data.state}<br>Obesity: ${data.obesity}%<br>Age: ${data.age}`);
+    circlesGroup.call(toolTip);
+    // mouseover on and out
+    // DO NOT use pointers... apparently it REALLY doesn't like them in this part
+    circlesGroup.on("mouseover", function(data) {
+            return toolTip.show(data,this);
+        })
+    circlesGroup.on("mouseout", function(data, index) {
+            return toolTip.hide(data,this);
+        })
 
     // axes labels
     // yaxis
