@@ -6,8 +6,8 @@ let svgWidth = 690;
 let svgHeight = 500;
 let margin = {
     top: 20,
-    bottom: 20,
-    left: 40,
+    bottom: 60,
+    left: 60,
     right: 40
 };
 let width = svgWidth - margin.left - margin.right;
@@ -23,60 +23,35 @@ let svg = d3.select("#scatter")
 let chartGroup = svg.append("g")
     .attr("transform",`translate(${margin.left},${margin.top})`);
 
-// initial params
-let chosenXAxis = "obesity";
-let chosenYAxis = "age";
+// set initial axis parameters
+let chosenXaxis = "obesity";
+let chosenYaxis = "age";
 
-// function for updating x and y scale variables upon click on axis label
-// 20% domain buffer from minimum and maximum values
-function xScale(updateData, chosenXAxis) {
-    // create scales
+// render the scales with 20% buffers
+function renderXScale(healthdata, chosenXaxis) {
     let xLinearScale = d3.scaleLinear()
         .domain([
-            d3.min(updateData, data => data[chosenXAxis]) * 0.8,
-            d3.max(updateData, data => data[chosenXAxis]) * 1.2
+            d3.min(healthdata, data => data[chosenXaxis]) * 0.8,
+            d3.max(healthdata, data => data[chosenXaxis]) * 1.2
         ])
         .range([0,width]);
-
     return xLinearScale;
 };
-function yScale(updateData, chosenYAxis) {
-    // create scales
+function renderYScale(healthdata, chosenYaxis) {
     let yLinearScale = d3.scaleLinear()
         .domain([
-            d3.min(updateData, data => data[chosenYAxis]) * 0.8,
-            d3.max(updateData, data => data[chosenYAxis]) * 1.2
+            d3.min(healthdata, data => data[chosenYaxis]) * 0.8,
+            d3.max(healthdata, data => data[chosenYaxis]) * 1.2
         ])
         .range([height,0]);
 
     return yLinearScale;
-}
-
-// function for updating xAxis variable uplong click on axis label
-function renderAxes(updateXScale, xAxis) {
-    let bottomAxis = d3.axisBottom(updateXScale);
-
-    xAxis.transition()
-        .duration(1000)
-        .call(bottomAxis);
-    
-    return xAxis;
-};
-
-// function for updating circles group with transition to new circles
-function renderCircles(circleGroup, updateXScale, chosenXAxis) {
-    circleGroup.transition()
-        .duration(1000)
-        .attr("cx", data => updateXScale(data[chosenXAxis]));
-    
-    return circleGroup;
 };
 
 // select the data for the charts from the csv
-d3.csv(dataUrl).then(data => {
-
+d3.csv(dataUrl).then(healthdata => {
     // parse data and make them integers
-    data.forEach(data => {
+    healthdata.forEach(data => {
         data.id = +data.id;
         data.age = +data.age;
         data.ageMoe = +data.ageMoe;
@@ -94,103 +69,56 @@ d3.csv(dataUrl).then(data => {
         data.smokesHigh = +data.smokesHigh;
         data.smokesLow = +data.smokesLow;
     });
-    console.log("data",data);
+    console.log("healthdata",healthdata);
 
-    // xLinearScale & yLinearScale functions
-    let xLinearScale = xScale(data, chosenXAxis);
-    let yLinearScale = yScale(data, chosenYAxis);
+    // scale the function
+    let xLinearScale = renderXScale(healthdata, chosenXaxis);
+    let yLinearScale = renderYScale(healthdata, chosenYaxis);
 
-    // create the initial axis functions
+    // create the axis functions
     let bottomAxis = d3.axisBottom(xLinearScale);
     let leftAxis = d3.axisLeft(yLinearScale);
 
-    // create/append the axis on the page
+    // append axis to the chart
     // x axis
-    let xAxis = chartGroup.append("g")
-        .classed("x-axis",true)
-        .attr("transform", `translate(0, ${height})`)
+    chartGroup.append("g")
+        .attr("transform", `translate(0,${height})`)
         .call(bottomAxis);
     // y axis
     chartGroup.append("g")
         .call(leftAxis);
 
-    // create/append initial circles
-    let circleGroup = chartGroup.selectAll("circle")
-        .data(data)
+    // create circles
+    let circlesGroup = chartGroup.selectAll("circle")
+        .data(healthdata)
         .enter()
-        .append("circle")
-        .attr("cx", d => xLinearScale(d[chosenXAxis]))
-        .attr("cy", d => yLinearScale(d[chosenYAxis]))
+        .append("g")
+    let circling = circlesGroup.append("circle")
+        .attr("cx", data => xLinearScale(data.obesity))
+        .attr("cy", data => yLinearScale(data.age))
         .attr("r", 10)
         .attr("fill","lightblue")
-        .attr("opacity","0.75")
+        .attr("opacity","0.75");
+    let texting = circlesGroup.append("text")
+        .text(data => data.abbr)
+        .attr("x", data => xLinearScale(data.obesity))
+        .attr("y", data => yLinearScale(data.age)+4)
+        .attr("fill","white")
+        .attr("font-size", "11px")
+        .attr("text-anchor", "middle")
 
-    // let textGroup = chartGroup.selectAll("text")
-    //     .data(data)
-    //     .enter()
-    //     .append("text")
-    //     .text(d => d.abbr)
-    //     .attr("x", d => xLinearScale(d[chosenXAxis]))
-    //     .attr("y", d => yLinearScale(d[chosenYAxis]))
-    //     .attr("font-size","11px")
-    //     .attr("fill", "black")
-
-    // create the group for two x-axis labels
-    let xlabelsGroup = chartGroup.append("g")
-        .attr("transform", `translate(${width/2},${height + 20})`); //centers text
-
-    let obesityLabel = xlabelsGroup.append("text")
-        .attr("x",0)
-        .attr("y",20)
-        .attr("value","obesity") //value to grab for event listener
-        .classed("active", true)
-        .text("Obesity %");
-    
-    let healthcareLabel = xlabelsGroup.apped("text")
-        .attr("x",0)
-        .attr("y",40)
-        .attr("value","healthcare") //value to grab for event listener
-        .classed("active", true)
-        .text("Healthcare %");
-
-    // append y axis
+    // axes labels
+    // yaxis
     chartGroup.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left)
-        .attr("x", 0 - (height/2))
+        .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
-        .classed("axis-text",true)
-        .text("Age");
-
-    // x axis labels event listener
-    xlabelsGroup.selectAll("text")
-        .on("click",function(){
-            // get value of selection
-            let value = d3.select(this).attr("value");
-            if (value !== chosenXAxis) {
-                chosenXAxis = value;
-                console.log(chosenXAxis);
-
-                xLinearScale = xScale(data, chosenXAxis);
-                xAxis = renderAxes(xLinearScale, xAxis);
-
-                circleGroup = renderCircles(circleGroup, xLinearScale, chosenXAxis);
-                
-                if (chosenXAxis === "healthcare") {
-                    healthcareLabel
-                        .classed("active", true)
-                        .classed("inactive", false)
-                    obesityLabel
-                        .classed("active", false)
-                        .classed("inactive", true)
-                } else {
-                    healthcareLabel
-                        .classed("active", false)
-                        .classed("inactive", true)
-                    obesityLabel
-                        .classed("active", true)
-                        .classed("inactive", false)
-                }
-            }
-        });
+        .attr("class", "axisText")
+        .text("Age")
+    // xaxis
+    chartGroup.append("text")
+        .attr("transform", `translate(${width/2}, ${height + margin.top + 20})`)
+        .attr("class", "axisText")
+        .text("Obesity %");
 });
