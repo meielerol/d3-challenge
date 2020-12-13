@@ -225,6 +225,7 @@ d3.csv(dataUrl).then(healthdata => {
         .classed("aText",true) //from d3Style.css
         .text("Income ($)")
 
+    // dynamically retrieve the label names for the axes depending on chosenAxis
     function getLabel(chosenAxis) {
         let axisLabel = ""
         if (chosenAxis === "obesity") {
