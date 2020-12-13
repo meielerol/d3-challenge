@@ -6,8 +6,8 @@ let svgWidth = 690;
 let svgHeight = 500;
 let margin = {
     top: 20,
-    bottom: 60,
-    left: 60,
+    bottom: 100,
+    left: 100,
     right: 40
 };
 let width = svgWidth - margin.left - margin.right;
@@ -48,6 +48,8 @@ function renderYScale(healthdata, chosenYaxis) {
     return yLinearScale;
 };
 
+//
+
 // select the data for the charts from the csv
 d3.csv(dataUrl).then(healthdata => {
     // parse data and make them integers
@@ -75,24 +77,24 @@ d3.csv(dataUrl).then(healthdata => {
     let xLinearScale = renderXScale(healthdata, chosenXaxis);
     let yLinearScale = renderYScale(healthdata, chosenYaxis);
 
-    // create the axis functions
+    // initialize the axis functions
     let bottomAxis = d3.axisBottom(xLinearScale);
     let leftAxis = d3.axisLeft(yLinearScale);
 
     // append axis to the chart
-    // x axis
-    chartGroup.append("g")
+    let xAxis = chartGroup.append("g")
+        .classed("xaxis", true)
         .attr("transform", `translate(0,${height})`)
         .call(bottomAxis);
-    // y axis
-    chartGroup.append("g")
+    let yAxis = chartGroup.append("g")
+        .classed("yaxis", true)
         .call(leftAxis);
 
     // create circles
     let circlesGroup = chartGroup.selectAll("circle")
         .data(healthdata)
         .enter()
-        .append("g")
+        .append("g");
     let circling = circlesGroup.append("circle")
         .attr("cx", data => xLinearScale(data.obesity))
         .attr("cy", data => yLinearScale(data.age))
@@ -105,20 +107,61 @@ d3.csv(dataUrl).then(healthdata => {
         .attr("y", data => yLinearScale(data.age)+4)
         .attr("fill","white")
         .attr("font-size", "11px")
-        .attr("text-anchor", "middle")
+        .attr("text-anchor", "middle");
 
-    // axes labels
-    // yaxis
-    chartGroup.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left)
-        .attr("x", 0 - (height / 2))
-        .attr("dy", "1em")
-        .attr("class", "axisText")
+    // create axes label groups
+    let xLabelsGroup = chartGroup.append("g")
+        .attr("transform", `translate(${width/2}, ${height + margin.top + 20})`);
+    let yLabelsGroup = chartGroup.append("g")
+        .attr("transform", `translate(${0 - margin.left/2}, ${height/2})`);
+    // create the possible xaxis labels
+    let obesityLabel = xLabelsGroup.append("text")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("value","obesity")
+        .classed("active",true) //from d3Style.css
+        .classed("aText",true) //from d3Style.css
+        .text("Obesity (%)")
+    let healthcareLabel = xLabelsGroup.append("text")
+        .attr("x",0)
+        .attr("y",20)
+        .attr("value","healthcare")
+        .classed("inactive",true) //from d3Style.css
+        .classed("aText",true) //from d3Style.css
+        .text("Healthcare (%)")
+    let smokesLabel = xLabelsGroup.append("text")
+        .attr("x",0)
+        .attr("y",40)
+        .attr("value","smokes")
+        .classed("inactive",true) //from d3Style.css
+        .classed("aText",true) //from d3Style.css
+        .text("Smokes (%)")
+    // create the possible yaxis labels
+    let ageLabel = yLabelsGroup.append("text")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("transform","rotate(-90)")
+        .attr("dy","1em")
+        .attr("value","age")
+        .classed("active",true) //from d3Style.css
+        .classed("aText",true) //from d3Style.css
         .text("Age")
-    // xaxis
-    chartGroup.append("text")
-        .attr("transform", `translate(${width/2}, ${height + margin.top + 20})`)
-        .attr("class", "axisText")
-        .text("Obesity %");
+    let incomeLabel = yLabelsGroup.append("text")
+        .attr("x",0)
+        .attr("y",0-20)
+        .attr("transform","rotate(-90)")
+        .attr("dy","1em")
+        .attr("value","age")
+        .classed("inactive",true) //from d3Style.css
+        .classed("aText",true) //from d3Style.css
+        .text("Income")
+    let povertyLabel = yLabelsGroup.append("text")
+        .attr("x",0)
+        .attr("y",0-40)
+        .attr("transform","rotate(-90)")
+        .attr("dy","1em")
+        .attr("value","age")
+        .classed("inactive",true) //from d3Style.css
+        .classed("aText",true) //from d3Style.css
+        .text("Poverty")
 });
