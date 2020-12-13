@@ -6,7 +6,7 @@ let svgWidth = 690;
 let svgHeight = 500;
 let margin = {
     top: 20,
-    bottom: 100,
+    bottom: 120,
     left: 120,
     right: 40
 };
@@ -198,6 +198,13 @@ d3.csv(dataUrl).then(healthdata => {
         .classed("inactive",true) //from d3Style.css
         .classed("aText",true) //from d3Style.css
         .text("Smokes (%)")
+    let povertyLabel = xLabelsGroup.append("text")
+        .attr("x",0)
+        .attr("y",60)
+        .attr("value","poverty")
+        .classed("inactive",true) //from d3Style.css
+        .classed("aText",true) //from d3Style.css
+        .text("Poverty (%)")
     // create the possible yaxis labels
     let ageLabel = yLabelsGroup.append("text")
         .attr("x",0)
@@ -217,15 +224,6 @@ d3.csv(dataUrl).then(healthdata => {
         .classed("inactive",true) //from d3Style.css
         .classed("aText",true) //from d3Style.css
         .text("Income ($)")
-    let povertyLabel = yLabelsGroup.append("text")
-        .attr("x",0)
-        .attr("y",0-40)
-        .attr("transform","rotate(-90)")
-        .attr("dy","1em")
-        .attr("value","poverty")
-        .classed("inactive",true) //from d3Style.css
-        .classed("aText",true) //from d3Style.css
-        .text("Poverty (%)")
 
     function getLabel(chosenAxis) {
         let axisLabel = ""
@@ -235,12 +233,12 @@ d3.csv(dataUrl).then(healthdata => {
             axisLabel = healthcareLabel._groups[0][0].innerHTML;
         } else if (chosenAxis === "smokes") {
             axisLabel = smokesLabel._groups[0][0].innerHTML;
+        } else if (chosenAxis === "poverty") {
+            axisLabel = povertyLabel._groups[0][0].innerHTML;
         } else if (chosenAxis === "age") {
             axisLabel = ageLabel._groups[0][0].innerHTML;
         } else if (chosenAxis === "income") {
             axisLabel = incomeLabel._groups[0][0].innerHTML;
-        } else if (chosenAxis === "poverty") {
-            axisLabel = povertyLabel._groups[0][0].innerHTML;
         } else {
             console.log("Something went wrong selecting the axis labels in getLabel function");
         };
@@ -285,6 +283,9 @@ d3.csv(dataUrl).then(healthdata => {
                     smokesLabel
                         .classed("active",false)
                         .classed("inactive",true);
+                    povertyLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
                 } else if (chosenXaxis === "healthcare") {
                     obesityLabel
                         .classed("active", false)
@@ -293,6 +294,9 @@ d3.csv(dataUrl).then(healthdata => {
                         .classed("active", true)
                         .classed("inactive",false);
                     smokesLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                    povertyLabel
                         .classed("active",false)
                         .classed("inactive",true);
                 } else if (chosenXaxis === "smokes") {
@@ -305,6 +309,22 @@ d3.csv(dataUrl).then(healthdata => {
                     smokesLabel
                         .classed("active",true)
                         .classed("inactive",false);
+                    povertyLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                } else if (chosenXaxis === "poverty") {
+                    obesityLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    healthcareLabel
+                        .classed("active", false)
+                        .classed("inactive", true);
+                    smokesLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                    povertyLabel
+                        .classed("active",true)
+                        .classed("inactive",false);
                 } else {
                     console.log("Something went wrong swithcing xaxis labels");
                     obesityLabel
@@ -314,6 +334,9 @@ d3.csv(dataUrl).then(healthdata => {
                         .classed("active", false)
                         .classed("inactive", true);
                     smokesLabel
+                        .classed("active",false)
+                        .classed("inactive",true);
+                    povertyLabel
                         .classed("active",false)
                         .classed("inactive",true);
                 };//end updating xaxis titles to active selection
@@ -353,9 +376,6 @@ d3.csv(dataUrl).then(healthdata => {
                     incomeLabel
                         .classed("active", false)
                         .classed("inactive",true);
-                    povertyLabel
-                        .classed("active",false)
-                        .classed("inactive",true);
                 } else if (chosenYaxis === "income") {
                     ageLabel
                         .classed("active", false)
@@ -363,30 +383,14 @@ d3.csv(dataUrl).then(healthdata => {
                     incomeLabel
                         .classed("active", true)
                         .classed("inactive",false);
-                    povertyLabel
-                        .classed("active",false)
-                        .classed("inactive",true);
-                } else if (chosenYaxis === "poverty") {
+                } else {
+                    console.log("Something went wrong swithcing yaxis labels");
                     ageLabel
                         .classed("active", false)
                         .classed("inactive", true);
                     incomeLabel
                         .classed("active", false)
                         .classed("inactive", true);
-                    povertyLabel
-                        .classed("active",true)
-                        .classed("inactive",false);
-                } else {
-                    console.log("Something went wrong swithcing yaxis labels");
-                    ageLabel
-                        .classed("active", false)
-                        .classed("inactive", true);
-                        incomeLabel
-                        .classed("active", false)
-                        .classed("inactive", true);
-                        povertyLabel
-                        .classed("active",false)
-                        .classed("inactive",true);
                 };//end updating yaxis titles to active selection
             };//end yAxisSelect main IF
         });//end yLabelsGroup.on("click",function(){})
