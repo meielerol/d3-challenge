@@ -26,6 +26,8 @@ let chartGroup = svg.append("g")
 // set initial axis parameters
 let chosenXaxis = "obesity";
 let chosenYaxis = "age";
+let xLabel = "Obesity (%)";
+let yLabel = "Age (Yr)";
 
 // create the axes scale ranges with 20% buffers
 function renderXScale(healthdata, chosenXaxis) {
@@ -86,6 +88,26 @@ function renderTexting(updateTexting, updateXLinearScale, updateYLinearScale, ch
     return updateTexting;
 };
 
+// render toolTip
+function renderToolTip(updateCirclesGroup, chosenXaxis, chosenYaxis, xLabel, yLabel) {
+    // create tool tips for circles
+    let toolTip = d3.tip()
+        .attr("class","d3-tip") //from d3Style.css
+        .offset([80,-60])
+        .html(data => `<b>${data.state}</b><br>${xLabel}: ${data[chosenXaxis]}<br>${yLabel}: ${data[chosenYaxis]}`);
+    updateCirclesGroup.call(toolTip);
+    // mouseover on and out
+    // DO NOT use pointers... apparently it REALLY doesn't like them in this part
+    updateCirclesGroup.on("mouseover", function(data) {
+            return toolTip.show(data,this);
+        })
+    updateCirclesGroup.on("mouseout", function(data, index) {
+            return toolTip.hide(data,this);
+        })
+    
+    return updateCirclesGroup;
+};
+
 // select the data for the charts from the csv
 d3.csv(dataUrl).then(healthdata => {
     // parse data and make them integers
@@ -126,17 +148,19 @@ d3.csv(dataUrl).then(healthdata => {
         .classed("yaxis", true)
         .call(leftAxis);
 
-    // create circles
+    // create circlesGroup for reference
     let circlesGroup = chartGroup.selectAll("circle")
         .data(healthdata)
         .enter()
         .append("g");
+    // get circle locations/size/color
     let circling = circlesGroup.append("circle")
         .attr("cx", data => xLinearScale(data.obesity))
         .attr("cy", data => yLinearScale(data.age))
         .attr("r", 10)
         .attr("fill","lightblue")
         .attr("opacity","0.75");
+    // get the text inside circles
     let texting = circlesGroup.append("text")
         .text(data => data.abbr)
         .attr("x", data => xLinearScale(data.obesity))
@@ -144,6 +168,8 @@ d3.csv(dataUrl).then(healthdata => {
         .attr("fill","white")
         .attr("font-size", "11px")
         .attr("text-anchor", "middle");
+    // initialize toolTips
+    let tipping = renderToolTip(circlesGroup, chosenXaxis, chosenYaxis, xLabel, yLabel);
 
     // create axes label groups
     let xLabelsGroup = chartGroup.append("g")
@@ -181,7 +207,7 @@ d3.csv(dataUrl).then(healthdata => {
         .attr("value","age")
         .classed("active",true) //from d3Style.css
         .classed("aText",true) //from d3Style.css
-        .text("Age")
+        .text("Age (Yr)")
     let incomeLabel = yLabelsGroup.append("text")
         .attr("x",0)
         .attr("y",0-20)
@@ -190,7 +216,7 @@ d3.csv(dataUrl).then(healthdata => {
         .attr("value","income")
         .classed("inactive",true) //from d3Style.css
         .classed("aText",true) //from d3Style.css
-        .text("Income")
+        .text("Income ($)")
     let povertyLabel = yLabelsGroup.append("text")
         .attr("x",0)
         .attr("y",0-40)
@@ -199,7 +225,28 @@ d3.csv(dataUrl).then(healthdata => {
         .attr("value","poverty")
         .classed("inactive",true) //from d3Style.css
         .classed("aText",true) //from d3Style.css
-        .text("Poverty")
+        .text("Poverty (%)")
+
+    function getLabel(chosenAxis) {
+        let axisLabel = ""
+        if (chosenAxis === "obesity") {
+            axisLabel = obesityLabel._groups[0][0].innerHTML;
+        } else if (chosenAxis === "healthcare") {
+            axisLabel = healthcareLabel._groups[0][0].innerHTML;
+        } else if (chosenAxis === "smokes") {
+            axisLabel = smokesLabel._groups[0][0].innerHTML;
+        } else if (chosenAxis === "age") {
+            axisLabel = ageLabel._groups[0][0].innerHTML;
+        } else if (chosenAxis === "income") {
+            axisLabel = incomeLabel._groups[0][0].innerHTML;
+        } else if (chosenAxis === "poverty") {
+            axisLabel = povertyLabel._groups[0][0].innerHTML;
+        } else {
+            console.log("Something went wrong selecting the axis labels in getLabel function");
+        };
+
+        return axisLabel;
+    };
 
     // switch between axes labels
     xLabelsGroup.selectAll("text")
@@ -221,6 +268,11 @@ d3.csv(dataUrl).then(healthdata => {
                 // update the circles with new xaxis info
                 circling = renderCircling(circling, xLinearScale, yLinearScale, chosenXaxis, chosenYaxis);
                 texting = renderTexting(texting, xLinearScale, yLinearScale, chosenXaxis, chosenYaxis);
+                
+                // update tooltips with new xaxis info
+                xLabel = getLabel(chosenXaxis);
+                // console.log("[xLabel, yLabel]:", `[${xLabel},${yLabel}]`);
+                tipping = renderToolTip(circlesGroup, chosenXaxis, chosenYaxis, xLabel, yLabel);
 
                 // update xaxis title to active selection
                 if (chosenXaxis === "obesity") {
@@ -287,6 +339,11 @@ d3.csv(dataUrl).then(healthdata => {
                 // update the circles with new yaxis info
                 circling = renderCircling(circling, xLinearScale, yLinearScale, chosenXaxis, chosenYaxis);
                 texting = renderTexting(texting, xLinearScale, yLinearScale, chosenXaxis, chosenYaxis);
+
+                // update tooltips with new xaxis info
+                yLabel = getLabel(chosenYaxis);
+                // console.log("[xLabel, yLabel]:", `[${xLabel},${yLabel}]`);
+                tipping = renderToolTip(circlesGroup, chosenXaxis, chosenYaxis, xLabel, yLabel);
 
                 // update yaxis title to active selection
                 if (chosenYaxis === "age") {
