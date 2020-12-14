@@ -26,36 +26,36 @@ x-axis titles:
 - `Smokes (%)`
 - `Poverty (%)`
 
-### Different Chart Views
+## Different Chart Views
 
-__Age vs. Obesity__
+* __Age vs. Obesity__
 
 <p align="center"><img src="https://github.com/meielerol/d3-challenge/blob/main/images/Age-vs-Obesity.png" alt="Age vs. Obesity"></p>
 
-__Age vs. Healthcare__
+* __Age vs. Healthcare__
 
 <p align="center"><img src="https://github.com/meielerol/d3-challenge/blob/main/images/Age-vs-Healthcare.png" alt="Age vs. Healthcare"></p>
 
-__Age vs. Smokes__
+* __Age vs. Smokes__
 
 <p align="center"><img src="https://github.com/meielerol/d3-challenge/blob/main/images/Age-vs-Smokes.png" alt="Age vs. Smokes"></p>
 
-__Age vs. Poverty__
+* __Age vs. Poverty__
 
 <p align="center"><img src="https://github.com/meielerol/d3-challenge/blob/main/images/Age-vs-Poverty.png" alt="Age vs. Poverty"></p>
 
-__Income vs. Obesity__
+* __Income vs. Obesity__
 
 <p align="center"><img src="https://github.com/meielerol/d3-challenge/blob/main/images/Income-vs-Obesity.png" alt="Income vs. Obesity"></p>
 
-__Income vs. Healthcare__
+* __Income vs. Healthcare__
 
 <p align="center"><img src="https://github.com/meielerol/d3-challenge/blob/main/images/Income-vs-Healthcare.png" alt="Income vs. Healthcare"></p>
 
-__Income vs. Smokes__
+* __Income vs. Smokes__
 
 <p align="center"><img src="https://github.com/meielerol/d3-challenge/blob/main/images/Income-vs-Smokes.png" alt="Income vs. Smokes"></p>
 
-__Income vs. Poverty__
+* __Income vs. Poverty__
 
 <p align="center"><img src="https://github.com/meielerol/d3-challenge/blob/main/images/Income-vs-Poverty.png" alt="Income vs. Poverty"></p>
