@@ -8,9 +8,9 @@ Data set is gathered from the US Census Bureau and Behavioral Risk Factor Survei
 
 The site can be located here: https://meielerol.github.io/d3-challenge/
 
-There are two different variations of the site available. Currently it is set to the [app.js](https://github.com/meielerol/d3-challenge/blob/main/D3_data_journalism/assets/js/app.js) which allows for dynamic interaction with variable axes infomration. For a static comparison of Age vs. Obesity comment out the [app.js](https://github.com/meielerol/d3-challenge/blob/main/D3_data_journalism/assets/js/app.js) and comment in the [basic-app.js](https://github.com/meielerol/d3-challenge/blob/main/D3_data_journalism/assets/js/basic-app.js) into the [index.html](https://github.com/meielerol/d3-challenge/blob/main/D3_data_journalism/index.html).
+There are two different variations of the site available. Currently it is set to the [app.js](https://github.com/meielerol/d3-challenge/blob/main/D3_data_journalism/assets/js/app.js) which allows for dynamic interaction with variable axes infomration. For a static comparison of Age vs. Obesity comment out the [app.js](https://github.com/meielerol/d3-challenge/blob/main/D3_data_journalism/assets/js/app.js) and comment in the [basic-app.js](https://github.com/meielerol/d3-challenge/blob/main/D3_data_journalism/assets/js/basic-app.js) into the [index.html](https://github.com/meielerol/d3-challenge/blob/main/index.html).
 
-Note: If opening the [index.html](https://github.com/meielerol/d3-challenge/blob/main/D3_data_journalism/index.html) from a download, you'll need to use `python -m http.server` or a live server to host the site.
+Note: If opening the [index.html](https://github.com/meielerol/d3-challenge/blob/main/index.html) from a download, you'll need to use `python -m http.server` or a live server to host the site.
 
 ## Chart Interaction
 
