@@ -1,5 +1,5 @@
 // set the data set constant reference
-const dataUrl = "/D3_data_journalism/assets/data/data.csv";
+const dataUrl = "/assets/data/data.csv";
 
 // set the svg up
 let svgWidth = 690;
